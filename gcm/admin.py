@@ -1,3 +1,4 @@
+from uuid import UUID
 from functools import update_wrapper
 from django.contrib import admin
 from django.shortcuts import redirect, render_to_response
@@ -11,7 +12,7 @@ Device = get_device_model()
 
 
 class DeviceAdmin(admin.ModelAdmin):
-    list_display = ['dev_id', 'name', 'modified_date', 'is_active']
+    list_display = ['dev_id', 'name', 'modified_date', 'is_active', 'send_message_url']
     search_fields = ('dev_id', 'name')
     list_filter = ['is_active']
     date_hierarchy = 'modified_date'
@@ -38,10 +39,13 @@ class DeviceAdmin(admin.ModelAdmin):
                              self.model._meta.model_name,
                              url_name)
 
+    def send_message_url(self, obj):
+        return '<a href="send-message/?device_ids=%s">Send message</a>' % (obj.pk,)
+    send_message_url.allow_tags = True
+
     def send_message_view(self, request):
         base_view = 'admin:%s' % self.build_admin_url('changelist')
-        session_key = 'device_ids'
-        device_ids = request.session.get(session_key)
+        device_ids = request.GET.get('device_ids', []).split(',')
         if not device_ids:
             return redirect(base_view)
 
@@ -51,7 +55,6 @@ class DeviceAdmin(admin.ModelAdmin):
             for device in devices:
                 device.send_message(form.cleaned_data['message'])
             self.message_user(request, _('Message was sent.'))
-            del request.session[session_key]
             return redirect(base_view)
 
         context = {'form': form, 'opts': self.model._meta, 'add': False}
@@ -60,9 +63,12 @@ class DeviceAdmin(admin.ModelAdmin):
 
     def send_message_action(self, request, queryset):
         ids = queryset.values_list('id', flat=True)
-        request.session['device_ids'] = list(ids)
+        if isinstance(ids[0], UUID):
+            ids = [pk.hex for pk in ids]
         url = 'admin:%s' % self.build_admin_url('send_message')
-        return redirect(url)
+        resp = redirect(url)
+        resp['Location'] += '?device_ids=%s' % ','.join(ids)
+        return resp
     send_message_action.short_description = _("Send message")
 
 
