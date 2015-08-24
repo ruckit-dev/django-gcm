@@ -16,7 +16,6 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ('dev_id', 'name')
     list_filter = ['is_active']
     date_hierarchy = 'modified_date'
-    readonly_fields = ('dev_id', 'reg_id')
     actions = ['send_message_action']
 
     def get_urls(self):
