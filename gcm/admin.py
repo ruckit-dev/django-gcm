@@ -52,10 +52,7 @@ class DeviceAdmin(admin.ModelAdmin):
         if form.is_valid():
             devices = Device.objects.filter(pk__in=device_ids)
             for device in devices:
-                device.send_message(form.cleaned_data['message'],
-                        notification={'title':'Message from your Ruckit Rep',
-                            'body': form.cleaned_data['message'],
-                            'icon': 'cast_ic_notification_0'})
+                device.send_message(form.cleaned_data['message'])
             self.message_user(request, _('Message was sent.'))
             return redirect(base_view)
 
