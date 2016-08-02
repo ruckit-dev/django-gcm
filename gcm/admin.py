@@ -26,12 +26,11 @@ class DeviceAdmin(admin.ModelAdmin):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        urlpatterns = patterns(
-            '',
-            url(r'^send-message/$', wrap(self.send_message_view),
-                name=self.build_admin_url('send_message')),
-        )
-        return urlpatterns + super(DeviceAdmin, self).get_urls()
+        gcm_urlpatterns = [
+                url(r'^send-message/$', wrap(self.send_message_view),
+                    name=self.build_admin_url('send_message'))
+                ]
+        return gcm_urlpatterns + super(DeviceAdmin, self).get_urls()
 
     def build_admin_url(self, url_name):
         return '%s_%s_%s' % (self.model._meta.app_label,
