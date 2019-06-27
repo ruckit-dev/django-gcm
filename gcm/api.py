@@ -55,7 +55,7 @@ class GCMMessage(object):
             'Content-Type': 'application/json',
             'Authorization': 'key=' + self.api_key}
 
-        response = requests.post(url="https://android.googleapis.com/gcm/send",
+        response = requests.post(url="https://fcm.googleapis.com/fcm/send",
                                  data=values,
                                  headers=headers)
         response.raise_for_status()
