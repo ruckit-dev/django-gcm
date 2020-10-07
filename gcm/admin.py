@@ -1,6 +1,6 @@
 from functools import update_wrapper
 from django.contrib import admin
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect, render
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
@@ -55,8 +55,7 @@ class DeviceAdmin(admin.ModelAdmin):
             return redirect(base_view)
 
         context = {'form': form, 'opts': self.model._meta, 'add': False}
-        return render_to_response('gcm/admin/send_message.html', context,
-                                  context_instance=RequestContext(request))
+        return render(request=request, template_name='gcm/admin/send_message.html', context=context)
 
     def send_message_action(self, request, queryset):
         ids = queryset.values_list('id', flat=True)
