@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from gcm import VERSION
 
 setup(
-    name='django-gcm',
+    name='gcm',
     version=VERSION,
     description='Google Cloud Messaging Server',
     long_description=open('README.rst').read(),
